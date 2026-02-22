@@ -169,6 +169,7 @@ const OwnerDashboard: React.FC = () => {
         } catch (err) { setItemDialogError(getApiError(err)); }
     };
 
+
     const handleDeleteItem = (id: string, name: string) => {
         requestConfirm('Remove Dish', `Remove "${name}" from the menu? Customers won't see it anymore.`, 'Yes, Remove', async () => {
             closeConfirm();
@@ -240,42 +241,44 @@ const OwnerDashboard: React.FC = () => {
             <div className="module-view menu-module-view fade-in">
                 <div className={`menu-catalog-grid ${selectedItem ? 'has-detail' : ''}`}>
 
-                    {/* ── LEFT COLUMN: categories + items ── */}
-                    <div className="menu-left-col">
-                        {/* Group Scroll Row */}
-                        <div className="menu-section-label">CATEGORIES</div>
-                        <div className="group-scroll-row">
-                            <div className="group-card group-add-card" onClick={() => { setGroupDialogError(null); setShowGroupDialog(true); }}>
-                                <div className="group-add-icon">+</div>
-                                <span>New Group</span>
-                            </div>
-                            {menuGroups.map(group => (
-                                <div key={group.id} className={`group-card ${activeGroup?.id === group.id ? 'active' : ''}`}
-                                    onClick={() => { setActiveGroup(group); setSelectedItem(null); }}>
-                                    {group.image_url
-                                        ? <img src={group.image_url} alt={group.title} />
-                                        : <div className="group-card-placeholder">{group.title.charAt(0)}</div>}
-                                    <div className="group-card-label">{group.title}</div>
-                                    {activeGroup?.id === group.id && <div className="group-active-bar" />}
+                    {/* ── LEFT COLUMN: fixed controls + scrolling items ── */}
+                    <div className="menu-left-col-structured">
+
+                        <div className="menu-fixed-controls">
+                            <div className="menu-section-label">CATEGORIES</div>
+                            <div className="group-scroll-row">
+                                <div className="group-card group-add-card" onClick={() => { setGroupDialogError(null); setShowGroupDialog(true); }}>
+                                    <div className="group-add-icon">+</div>
+                                    <span>New Group</span>
                                 </div>
-                            ))}
+                                {menuGroups.map(group => (
+                                    <div key={group.id} className={`group-card ${activeGroup?.id === group.id ? 'active' : ''}`}
+                                        onClick={() => { setActiveGroup(group); setSelectedItem(null); }}>
+                                        {group.image_url
+                                            ? <img src={group.image_url} alt={group.title} />
+                                            : <div className="group-card-placeholder">{group.title.charAt(0)}</div>}
+                                        <div className="group-card-label">{group.title}</div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {activeGroup && (
+                                <div className="items-panel-header">
+                                    <div className="panel-title-block">
+                                        <h2 className="items-panel-title">{activeGroup.title}</h2>
+                                        <p className="items-panel-sub">{groupItems.length} items</p>
+                                    </div>
+                                    <div className="items-panel-actions">
+                                        <button className="minimal-action danger"
+                                            onClick={() => handleDeleteGroup(activeGroup.id, activeGroup.title)}>Del Group</button>
+                                        <button className="action-btn-main" onClick={() => { setItemDialogError(null); setShowItemDialog(true); }}>+ Add</button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
-                        {/* Items Panel */}
-                        {activeGroup && (
-                            <div className="items-panel">
-                                <div className="items-panel-header">
-                                    <div>
-                                        <h2 className="items-panel-title">{activeGroup.title}</h2>
-                                        <p className="items-panel-sub">{groupItems.length} items · click any item to view details</p>
-                                    </div>
-                                    <div style={{ display: 'flex', gap: '1rem' }}>
-                                        <button className="minimal-action danger" style={{ padding: '0.6rem 1.2rem' }}
-                                            onClick={() => handleDeleteGroup(activeGroup.id, activeGroup.title)}>Delete Group</button>
-                                        <button className="action-btn-main" onClick={() => { setItemDialogError(null); setShowItemDialog(true); }}>+ Add Item</button>
-                                    </div>
-                                </div>
-
+                        <div className="menu-scroll-area">
+                            {activeGroup && (
                                 <div className="items-grid-vertical">
                                     {groupItems.map(item => (
                                         <div key={item.id}
@@ -298,26 +301,26 @@ const OwnerDashboard: React.FC = () => {
                                                 </div>
                                                 <p className="menu-item-desc">{item.description || 'No description available'}</p>
                                             </div>
-                                            <div className="menu-item-actions">
-                                                <button className="action-icon danger" onClick={e => { e.stopPropagation(); handleDeleteItem(item.id, item.name); }}>🗑️</button>
+                                            <div className="menu-item-actions" onClick={e => e.stopPropagation()}>
+                                                <button className="action-icon danger"
+                                                    onClick={() => handleDeleteItem(item.id, item.name)}>🗑️</button>
                                             </div>
                                         </div>
                                     ))}
                                     {groupItems.length === 0 && (
-                                        <div className="empty-state" style={{ gridColumn: '1 / -1' }}>
-                                            <p>No items yet. Click <strong>+ Add Item</strong> to begin.</p>
+                                        <div className="empty-state">
+                                            <p>No items yet. Click <strong>+ Add</strong> to begin.</p>
                                         </div>
                                     )}
                                 </div>
-                            </div>
-                        )}
-
-                        {menuGroups.length === 0 && !menuLoading && (
-                            <div className="empty-state" style={{ marginTop: '4rem' }}>
-                                <p>No groups yet. Click <strong>+ New Group</strong> to create your first category.</p>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
+                    {menuGroups.length === 0 && !menuLoading && (
+                        <div className="empty-state" style={{ marginTop: '4rem' }}>
+                            <p>No groups yet. Click <strong>+ New Group</strong> to create your first category.</p>
+                        </div>
+                    )}
 
                     {/* ── RIGHT COLUMN: full-height detail panel ── */}
                     {selectedItem && (

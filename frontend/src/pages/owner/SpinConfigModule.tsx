@@ -203,7 +203,7 @@ const SpinConfigModule: React.FC<SpinConfigModuleProps> = ({ config, menuItems, 
                     </div>
                     <button className="action-btn-main" onClick={handleSave} disabled={isSaving}>
                         <span style={{ marginRight: '8px' }}>{isSaving ? '⏳' : '💾'}</span>
-                        {isSaving ? 'Saving Configuration...' : 'Save Intelligence'}
+                        {isSaving ? 'Saving...' : 'Save Changes'}
                     </button>
                 </div>
 
