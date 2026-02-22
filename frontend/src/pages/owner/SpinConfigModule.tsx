@@ -127,7 +127,8 @@ const SpinConfigModule: React.FC<SpinConfigModuleProps> = ({ config, menuItems, 
         }
 
         if (totalProb !== 100) {
-            alert('Total probability must be exactly 100%');
+            setAlertMessage('Total probability must be exactly 100%');
+            setIsAlertOpen(true);
             return;
         }
 
@@ -182,7 +183,8 @@ const SpinConfigModule: React.FC<SpinConfigModuleProps> = ({ config, menuItems, 
                         <p>Configure how customers earn and win rewards</p>
                     </div>
                     <button className="action-btn-main" onClick={handleSave} disabled={isSaving}>
-                        {isSaving ? 'Saving...' : 'Save Changes'}
+                        <span style={{ marginRight: '8px' }}>{isSaving ? '⏳' : '💾'}</span>
+                        {isSaving ? 'Saving Configuration...' : 'Save Intelligence'}
                     </button>
                 </div>
 

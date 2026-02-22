@@ -13,10 +13,14 @@
 
 /* Configuration Card removed in favor of Section-based layout */
 .sc-section {
-    background: var(--bg-side);
-    border: 1px solid var(--border);
+    background: linear-gradient(145deg, var(--bg-side), rgba(30, 41, 59, 0.4));
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: var(--radius-l);
     padding: 1.5rem;
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .sc-section.compact {
@@ -62,12 +66,16 @@
 }
 
 .sc-scroll-content::-webkit-scrollbar {
-    width: 6px;
+    width: 5px;
 }
 
 .sc-scroll-content::-webkit-scrollbar-thumb {
-    background: var(--border);
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
+}
+
+.sc-scroll-content::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 .sc-section {
@@ -102,22 +110,74 @@
 }
 
 .prob-indicator {
-    font-size: 0.85rem;
-    font-weight: 700;
-    padding: 0.4rem 0.8rem;
-    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 0.35rem 0.75rem;
+    border-radius: 30px;
     display: flex;
     align-items: center;
+    letter-spacing: 0.05em;
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
 }
 
 .prob-indicator.perfect {
     background: rgba(16, 185, 129, 0.1);
     color: #10b981;
+    border-color: rgba(16, 185, 129, 0.2);
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.1);
 }
 
 .prob-indicator.invalid {
     background: rgba(239, 68, 68, 0.1);
     color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.2);
+    animation: indicatorPulse 1.5s infinite var(--transition);
+}
+
+.action-btn-main {
+    background: linear-gradient(135deg, var(--primary), #b91c1c);
+    padding: 0.9rem 1.75rem !important;
+    font-size: 0.9rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: 0 8px 25px -5px rgba(212, 34, 32, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-btn-main:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px -5px rgba(212, 34, 32, 0.5);
+    filter: brightness(1.1);
+}
+
+.action-btn-main:active {
+    transform: translateY(-1px);
+}
+
+.action-btn-main:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    background: #4b5563;
+    box-shadow: none;
+}
+
+@keyframes indicatorPulse {
+    0% {
+        box-shadow: 0 0 0px rgba(239, 68, 68, 0);
+    }
+
+    50% {
+        box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+    }
+
+    100% {
+        box-shadow: 0 0 0px rgba(239, 68, 68, 0);
+    }
 }
 
 .slot-list {
@@ -234,30 +294,35 @@
 
 .sg-col input,
 .sg-col select {
-    padding: 0.5rem 0.7rem;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-s);
-    background: var(--bg-main);
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    background: rgba(15, 23, 42, 0.6);
     color: var(--text-head);
     outline: none;
-    font-size: 0.85rem;
-    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .sg-col input:focus,
 .sg-col select:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
+    background: rgba(15, 23, 42, 0.8);
+    box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.15);
+    transform: translateY(-1px);
 }
 
 .input-error {
     border-color: #ef4444 !important;
-    background: rgba(239, 68, 68, 0.05) !important;
+    background: rgba(239, 68, 68, 0.08) !important;
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1) !important;
 }
 
 .slot-item.has-error {
     border-color: #ef4444 !important;
-    box-shadow: 0 0 10px rgba(239, 68, 68, 0.1);
+    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.15);
 }
 
 .add-wedge-btn {
@@ -739,19 +804,29 @@
 }
 
 .preset-badge {
-    background: var(--bg-main);
-    border: 1px solid var(--border);
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 0.75rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-body);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .preset-badge:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.1);
+}
+
+.preset-badge:active {
+    transform: translateY(0);
     background: var(--primary);
     color: white;
-    border-color: var(--primary);
 }
 
 .sg-col small {
