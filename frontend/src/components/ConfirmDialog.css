@@ -1,0 +1,131 @@
+/* Premium Confirm Dialog */
+.cd-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(10px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: cd-fade-in 0.2s ease;
+}
+
+@keyframes cd-fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.cd-box {
+    background: var(--bg-side, #fff);
+    border: 1px solid var(--border, #e9ecef);
+    border-radius: 28px;
+    padding: 3rem 2.75rem;
+    width: 420px;
+    max-width: 90vw;
+    text-align: center;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.2);
+    animation: cd-pop-in 0.35s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+@keyframes cd-pop-in {
+    from {
+        opacity: 0;
+        transform: scale(0.88) translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.cd-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin: 0 auto 1.75rem;
+}
+
+.cd-icon.danger {
+    background: #fef2f2;
+}
+
+.cd-icon.info {
+    background: #eff6ff;
+}
+
+.cd-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 900;
+    letter-spacing: -1px;
+    color: var(--text-head, #1a1a1b);
+    margin-bottom: 0.75rem;
+}
+
+.cd-message {
+    color: var(--text-body, #64748b);
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.6;
+    margin-bottom: 2.25rem;
+}
+
+.cd-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.cd-btn {
+    flex: 1;
+    padding: 1rem;
+    border-radius: 14px;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: 0.2s;
+    border: none;
+}
+
+.cd-cancel {
+    background: var(--bg-main, #f8f9fa);
+    color: var(--text-head, #1a1a1b);
+    border: 1px solid var(--border, #e9ecef);
+}
+
+.cd-cancel:hover {
+    background: var(--border, #e9ecef);
+}
+
+.cd-danger {
+    background: #ef4444;
+    color: #fff;
+}
+
+.cd-danger:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+}
+
+.cd-confirm {
+    background: var(--primary, #d42220);
+    color: #fff;
+}
+
+.cd-confirm:hover {
+    background: var(--primary-dark, #b51a18);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(212, 34, 32, 0.3);
+}

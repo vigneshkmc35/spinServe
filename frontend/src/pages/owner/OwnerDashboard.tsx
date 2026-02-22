@@ -2,30 +2,29 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './OwnerDashboard.css';
 import { staffAPI, menuAPI } from '../../services/api';
-import { confirmAction, validateMobile, validateRequired, getApiError } from '../../utils/ui';
+import { validateMobile, validateRequired, getApiError } from '../../utils/ui';
+import ConfirmDialog from '../../components/ConfirmDialog';
 
 type TabType = 'dashboard' | 'kitchen' | 'server' | 'spin' | 'menu';
 
 interface StaffMember {
-    id: string;
-    name: string;
-    mobile: string;
-    role: string;
-    status: 'online' | 'offline';
+    id: string; name: string; mobile: string; role: string; status: 'online' | 'offline';
 }
 
 interface MenuItem {
-    id: string;
-    name: string;
-    category: string;
-    price: number;
-    is_available: boolean;
+    id: string; name: string; category: string; price: number; is_available: boolean;
 }
 
 interface Toast {
-    id: number;
+    id: number; message: string; type: 'success' | 'error';
+}
+
+interface ConfirmState {
+    isOpen: boolean;
+    title: string;
     message: string;
-    type: 'success' | 'error';
+    confirmLabel: string;
+    onConfirm: () => void;
 }
 
 const CATEGORIES = ['Breads', 'Signature Rice', 'Gourmet Sides', 'Desserts', 'Beverages'];
@@ -53,6 +52,10 @@ const FOOD_IMAGES: Record<string, string> = {
     'Cold Coffee': 'https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&q=80&w=300',
 };
 
+const DEFAULT_CONFIRM: ConfirmState = {
+    isOpen: false, title: '', message: '', confirmLabel: 'Confirm', onConfirm: () => { }
+};
+
 const OwnerDashboard: React.FC = () => {
     const [activeTab, setActiveTab] = useState<TabType>('dashboard');
     const [activeCategory, setActiveCategory] = useState<string>('Breads');
@@ -66,6 +69,7 @@ const OwnerDashboard: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [toasts, setToasts] = useState<Toast[]>([]);
+    const [confirmState, setConfirmState] = useState<ConfirmState>(DEFAULT_CONFIRM);
 
     const [allStaff, setAllStaff] = useState<StaffMember[]>([]);
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -82,12 +86,18 @@ const OwnerDashboard: React.FC = () => {
         localStorage.setItem('theme', next ? 'dark' : 'light');
     };
 
-    // --- Toast System ---
     const showToast = useCallback((message: string, type: 'success' | 'error') => {
         const id = Date.now();
         setToasts(prev => [...prev, { id, message, type }]);
         setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4000);
     }, []);
+
+    // Premium confirm helper — replaces window.confirm
+    const requestConfirm = useCallback((title: string, message: string, confirmLabel: string, onConfirm: () => void) => {
+        setConfirmState({ isOpen: true, title, message, confirmLabel, onConfirm });
+    }, []);
+
+    const closeConfirm = () => setConfirmState(DEFAULT_CONFIRM);
 
     const fetchAllData = useCallback(async () => {
         setLoading(true);
@@ -105,7 +115,6 @@ const OwnerDashboard: React.FC = () => {
 
     useEffect(() => { fetchAllData(); }, [fetchAllData]);
 
-    // Derived + filtered
     const currentRole = activeTab === 'kitchen' ? 'KITCHEN' : 'SERVER';
     const roleStaff = allStaff.filter(s => s.role === currentRole);
     const filteredStaff = roleStaff.filter(s =>
@@ -120,15 +129,35 @@ const OwnerDashboard: React.FC = () => {
 
     const handleLogout = () => { localStorage.removeItem('user'); navigate('/login'); };
 
-    const handleDeleteStaff = async (id: string, name: string) => {
-        if (!confirmAction(`Remove "${name}" from the team?`)) return;
-        try {
-            await staffAPI.delete(id);
-            setAllStaff(prev => prev.filter(s => s.id !== id));
-            showToast(`${name} has been removed.`, 'success');
-        } catch (err) {
-            showToast(getApiError(err), 'error');
-        }
+    const handleDeleteStaff = (id: string, name: string) => {
+        requestConfirm(
+            'Remove Member',
+            `Are you sure you want to remove "${name}" from the team? This action cannot be undone.`,
+            'Yes, Remove',
+            async () => {
+                closeConfirm();
+                try {
+                    await staffAPI.delete(id);
+                    setAllStaff(prev => prev.filter(s => s.id !== id));
+                    showToast(`${name} has been removed.`, 'success');
+                } catch (err) {
+                    showToast(getApiError(err), 'error');
+                }
+            }
+        );
+    };
+
+    const handleDeleteMenuItem = (id: string, name: string) => {
+        requestConfirm(
+            'Remove Dish',
+            `Remove "${name}" from the menu? This will be immediately unavailable to customers.`,
+            'Yes, Remove',
+            () => {
+                closeConfirm();
+                setMenuItems(prev => prev.filter(m => m.id !== id));
+                showToast(`${name} removed from menu.`, 'success');
+            }
+        );
     };
 
     const handleOnboardSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -138,7 +167,6 @@ const OwnerDashboard: React.FC = () => {
         const name = (formData.get('name') as string).trim();
         const mobile = (formData.get('mobile') as string).trim();
 
-        // Frontend validation first
         if (!validateRequired(name)) { setFormError('Name must be at least 2 characters.'); return; }
         if (!validateMobile(mobile)) { setFormError('Enter a valid 10-digit Indian mobile number (starts with 6-9).'); return; }
 
@@ -199,26 +227,17 @@ const OwnerDashboard: React.FC = () => {
                         + Onboard {roleLabel}
                     </button>
                 </div>
-
-                {/* Search Bar */}
                 <div className="search-bar-wrap">
                     <span className="search-icon">🔍</span>
-                    <input
-                        className="search-input"
-                        type="text"
+                    <input className="search-input" type="text"
                         placeholder={`Search ${roleLabel.toLowerCase()} by name or mobile…`}
                         value={searchQuery}
-                        onChange={e => setSearchQuery(e.target.value)}
-                    />
-                    {searchQuery && (
-                        <button className="search-clear" onClick={() => setSearchQuery('')}>×</button>
-                    )}
+                        onChange={e => setSearchQuery(e.target.value)} />
+                    {searchQuery && <button className="search-clear" onClick={() => setSearchQuery('')}>×</button>}
                 </div>
 
                 {filteredStaff.length === 0 ? (
-                    <div className="empty-state">
-                        <p>No members match "<strong>{searchQuery}</strong>"</p>
-                    </div>
+                    <div className="empty-state"><p>No members match "<strong>{searchQuery}</strong>"</p></div>
                 ) : (
                     <div className="staff-grid-structured">
                         {filteredStaff.map(member => (
@@ -246,23 +265,8 @@ const OwnerDashboard: React.FC = () => {
     };
 
     const renderContent = () => {
-        if (loading) return (
-            <div className="module-view">
-                <div className="loading-state">
-                    <div className="loader-ring"></div>
-                    <p>Fetching data from MongoDB…</p>
-                </div>
-            </div>
-        );
-
-        if (error) return (
-            <div className="module-view">
-                <div className="error-state">
-                    <p>⚠️ {error}</p>
-                    <button className="action-btn-main" onClick={fetchAllData} style={{ marginTop: '1rem' }}>Retry</button>
-                </div>
-            </div>
-        );
+        if (loading) return <div className="module-view"><div className="loading-state"><div className="loader-ring"></div><p>Fetching data from MongoDB…</p></div></div>;
+        if (error) return <div className="module-view"><div className="error-state"><p>⚠️ {error}</p><button className="action-btn-main" onClick={fetchAllData} style={{ marginTop: '1rem' }}>Retry</button></div></div>;
 
         switch (activeTab) {
             case 'dashboard':
@@ -275,11 +279,7 @@ const OwnerDashboard: React.FC = () => {
                         </div>
                     </div>
                 );
-
-            case 'kitchen':
-            case 'server':
-                return renderStaffModule();
-
+            case 'kitchen': case 'server': return renderStaffModule();
             case 'spin':
                 return (
                     <div className="module-view fade-in">
@@ -293,7 +293,6 @@ const OwnerDashboard: React.FC = () => {
                         </div>
                     </div>
                 );
-
             case 'menu': {
                 const filtered = menuItems.filter(item => item.category === activeCategory);
                 return (
@@ -315,12 +314,7 @@ const OwnerDashboard: React.FC = () => {
                                         <div className="top"><h3>{item.name}</h3><span className="price">₹{item.price}</span></div>
                                         <div className="actions">
                                             <button className="action-icon">✏️</button>
-                                            <button className="action-icon danger" onClick={() => {
-                                                if (confirmAction(`Remove "${item.name}" from the menu?`)) {
-                                                    setMenuItems(prev => prev.filter(m => m.id !== item.id));
-                                                    showToast(`${item.name} removed from menu.`, 'success');
-                                                }
-                                            }}>🗑️</button>
+                                            <button className="action-icon danger" onClick={() => handleDeleteMenuItem(item.id, item.name)}>🗑️</button>
                                         </div>
                                     </div>
                                 </div>
@@ -337,10 +331,18 @@ const OwnerDashboard: React.FC = () => {
         <div className={`app-layout ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
             {/* Toast Container */}
             <div className="toast-container">
-                {toasts.map(t => (
-                    <div key={t.id} className={`toast toast-${t.type}`}>{t.message}</div>
-                ))}
+                {toasts.map(t => <div key={t.id} className={`toast toast-${t.type}`}>{t.message}</div>)}
             </div>
+
+            {/* Premium Confirm Dialog */}
+            <ConfirmDialog
+                isOpen={confirmState.isOpen}
+                title={confirmState.title}
+                message={confirmState.message}
+                confirmLabel={confirmState.confirmLabel}
+                onConfirm={confirmState.onConfirm}
+                onCancel={closeConfirm}
+            />
 
             <aside className="app-sidebar">
                 <div className="sidebar-brand">

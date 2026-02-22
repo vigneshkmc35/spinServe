@@ -15,10 +15,6 @@ export const validatePrice = (price: number): boolean => {
     return price > 0;
 };
 
-export const confirmAction = (message: string): boolean => {
-    return window.confirm(message);
-};
-
 /**
  * Extract a readable error message from an Axios/API error
  */
