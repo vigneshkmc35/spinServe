@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.db.mongodb import get_database
-from typing import List
+from typing import List, Optional
 
 router = APIRouter()
 
@@ -15,6 +15,26 @@ async def get_restaurant_config(db: AsyncIOMotorDatabase = Depends(get_database)
         raise HTTPException(status_code=404, detail="Restaurant not found")
         
     return restaurant
+
+from pydantic import BaseModel
+from app.models.schemas import SpinnerSlot
+
+class UpdateConfigReq(BaseModel):
+    game_unlock_threshold: Optional[float] = None
+    game_unlock_initial: Optional[float] = None
+    game_unlock_increment: Optional[float] = None
+    spinner_slots: List[SpinnerSlot]
+
+@router.put("/config")
+async def update_restaurant_config(req: UpdateConfigReq, db: AsyncIOMotorDatabase = Depends(get_database)):
+    update_data = req.dict(exclude_unset=True)
+    res = await db.restaurants.update_one(
+        {"_id": "rest_001"},
+        {"$set": update_data}
+    )
+    if res.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Restaurant not found")
+    return {"status": "success"}
 
 @router.get("/menu")
 async def get_menu(db: AsyncIOMotorDatabase = Depends(get_database)):

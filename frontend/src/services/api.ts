@@ -40,4 +40,9 @@ export const menuAPI = {
     deleteItem: async (id: string) => { const r = await api.delete(`/menu/items/${id}`); return r.data; }
 };
 
+export const restaurantAPI = {
+    getConfig: async () => { const r = await api.get('/restaurant/config'); return r.data; },
+    updateConfig: async (data: any) => { const r = await api.put('/restaurant/config', data); return r.data; }
+};
+
 export default api;

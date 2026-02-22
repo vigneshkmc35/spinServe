@@ -1,9 +1,10 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './OwnerDashboard.css';
-import { staffAPI, menuAPI } from '../../services/api';
+import { staffAPI, menuAPI, restaurantAPI } from '../../services/api';
 import { validateMobile, validateRequired, getApiError } from '../../utils/ui';
 import ConfirmDialog from '../../components/ConfirmDialog';
+import SpinConfigModule from './SpinConfigModule';
 
 type TabType = 'dashboard' | 'kitchen' | 'server' | 'spin' | 'menu';
 
@@ -24,6 +25,8 @@ const OwnerDashboard: React.FC = () => {
     const [formLoading, setFormLoading] = useState(false);
     const [staffLoading, setStaffLoading] = useState(false);
     const [menuLoading, setMenuLoading] = useState(false);
+    const [restaurantConfig, setRestaurantConfig] = useState<any>(null);
+    const [spinSaving, setSpinSaving] = useState(false);
     const [staffError, setStaffError] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [toasts, setToasts] = useState<Toast[]>([]);
@@ -74,16 +77,21 @@ const OwnerDashboard: React.FC = () => {
     const fetchMenu = useCallback(async () => {
         setMenuLoading(true);
         try {
-            const [groups, items] = await Promise.all([menuAPI.getGroups(), menuAPI.getItems()]);
+            const [groups, items, config] = await Promise.all([
+                menuAPI.getGroups(),
+                menuAPI.getItems(),
+                restaurantAPI.getConfig()
+            ]);
             setMenuGroups(groups);
             setMenuItems(items);
+            setRestaurantConfig(config);
             if (groups.length > 0) setActiveGroup(g => g ?? groups[0]);
-        } catch { showToast('Failed to load menu data.', 'error'); }
+        } catch { showToast('Failed to load dashboard data.', 'error'); }
         finally { setMenuLoading(false); }
     }, [showToast]);
 
     useEffect(() => { fetchStaff(); }, [fetchStaff]);
-    useEffect(() => { if (activeTab === 'menu') fetchMenu(); }, [activeTab, fetchMenu]);
+    useEffect(() => { if (activeTab === 'menu' || activeTab === 'spin') fetchMenu(); }, [activeTab, fetchMenu]);
 
     const currentRole = activeTab === 'kitchen' ? 'KITCHEN' : 'SERVER';
     const roleStaff = allStaff.filter(s => s.role === currentRole);
@@ -407,14 +415,33 @@ const OwnerDashboard: React.FC = () => {
             );
             case 'kitchen': case 'server': return renderStaffModule();
             case 'spin': return (
-                <div className="module-view fade-in"><div style={{ maxWidth: 560, margin: '0 auto' }}>
-                    <div className="staff-card-structured">
-                        <h3 style={{ marginBottom: '2rem', fontSize: '1.5rem', fontWeight: 800 }}>Spin Configuration</h3>
-                        <div className="input-group"><label>Order Unlock Threshold (₹)</label><input type="number" defaultValue={200} /></div>
-                        <div className="input-group" style={{ marginTop: '1rem' }}><label>Daily Win Limit</label><input type="number" defaultValue={2} /></div>
-                        <button className="action-btn-main" style={{ marginTop: '2rem', width: '100%' }}>Update Rules</button>
-                    </div>
-                </div></div>
+                <SpinConfigModule
+                    config={restaurantConfig}
+                    menuItems={menuItems}
+                    menuGroups={menuGroups}
+                    isSaving={spinSaving}
+                    onSave={async (initial, increment, slots) => {
+                        setSpinSaving(true);
+                        try {
+                            await restaurantAPI.updateConfig({
+                                game_unlock_initial: initial,
+                                game_unlock_increment: increment,
+                                spinner_slots: slots
+                            });
+                            showToast('Spin Configuration updated successfully!', 'success');
+                            setRestaurantConfig({
+                                ...restaurantConfig,
+                                game_unlock_initial: initial,
+                                game_unlock_increment: increment,
+                                spinner_slots: slots
+                            });
+                        } catch (e) {
+                            showToast(getApiError(e) || 'Failed to update Spin Configuration', 'error');
+                        } finally {
+                            setSpinSaving(false);
+                        }
+                    }}
+                />
             );
             case 'menu': return renderMenuModule();
             default: return null;

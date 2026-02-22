@@ -39,7 +39,9 @@ class Restaurant(BaseModel):
     owner_id: str  # Reference to the owner User ID
     
     # Owner-configurable Gamification Metrics
-    game_unlock_threshold: float = 200.0      # E.g., Order must be > 200 Rs to unlock the game
+    game_unlock_threshold: float = 200.0      # Legacy single threshold
+    game_unlock_initial: float = 200.0        # First spin threshold
+    game_unlock_increment: float = 50.0       # Added threshold for each subsequent spin
     spinner_slots: List["SpinnerSlot"] = []   # The different prizes & probabilities available on the wheel
 
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
