@@ -136,9 +136,10 @@ const SpinConfigModule: React.FC<SpinConfigModuleProps> = ({ config, menuItems, 
         onSave(initialThreshold, incrementThreshold, slots);
     };
 
-    const colors = ['#f43f5e', '#ecfccb', '#8b5cf6', '#3b82f6', '#f59e0b', '#10b981', '#6366f1', '#14b8a6', '#f97316', '#a855f7'];
+    const colors = ['#f43f5e', '#fbbf24', '#8b5cf6', '#3b82f6', '#f97316', '#10b981', '#6366f1', '#06b6d4', '#ec4899', '#84cc16'];
 
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+    const [isLocked, setIsLocked] = useState(false);
 
     let cumulative = 0;
     const slices = slots.map((s, i) => {
@@ -394,7 +395,11 @@ const SpinConfigModule: React.FC<SpinConfigModuleProps> = ({ config, menuItems, 
                         <svg
                             viewBox="0 0 230 230"
                             className="svg-spin-wheel"
+                            onClick={() => {
+                                if (hoveredIndex !== null) setIsLocked(!isLocked);
+                            }}
                             onMouseMove={(e) => {
+                                if (isLocked) return;
                                 const rect = e.currentTarget.getBoundingClientRect();
                                 const x = e.clientX - rect.left - rect.width / 2;
                                 const y = e.clientY - rect.top - rect.height / 2;
@@ -418,7 +423,9 @@ const SpinConfigModule: React.FC<SpinConfigModuleProps> = ({ config, menuItems, 
 
                                 if (foundIdx !== hoveredIndex) setHoveredIndex(foundIdx);
                             }}
-                            onMouseLeave={() => setHoveredIndex(null)}
+                            onMouseLeave={() => {
+                                if (!isLocked) setHoveredIndex(null);
+                            }}
                         >
                             <defs>
                                 {colors.map((c, i) => (
@@ -467,42 +474,75 @@ const SpinConfigModule: React.FC<SpinConfigModuleProps> = ({ config, menuItems, 
                             <div className="selection-detail-card animate-slide-up" style={{ '--accent-color': colors[hoveredIndex % colors.length] } as any}>
                                 <div className="sd-overlay-glow"></div>
                                 <div className="sd-content">
-                                    <div className="sd-header">
-                                        <div className="sd-title-group">
-                                            <div className="sd-indicator"></div>
-                                            <div className="sd-title-main">
-                                                <h4>{slots[hoveredIndex].label || 'Unnamed Wedge'}</h4>
-                                                <span className="sd-subtitle">{slots[hoveredIndex].probability}% WIN PROBABILITY</span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    {(() => {
+                                        const slot = slots[hoveredIndex];
+                                        const slotLabel = (slot.label || '').toLowerCase().trim();
+                                        const rewardItem = menuItems.find(m => {
+                                            const itemName = m.name.toLowerCase();
+                                            return (slot.reward?.offer_type === 'FREE_ITEM' && m.name === slot.reward.item_name) ||
+                                                (slotLabel && (itemName.includes(slotLabel) || slotLabel.includes(itemName)));
+                                        });
+                                        const imageUrl = rewardItem?.image_url;
 
-                                    <div className="sd-reward-display">
-                                        <span className="sd-reward-tag">PRIZE DETAILS</span>
-                                        {slots[hoveredIndex].reward ? (
+                                        return (
                                             <>
-                                                <div className="gv-text">
-                                                    {slots[hoveredIndex].reward?.offer_type === 'PERCENTAGE_DISCOUNT' ? (
-                                                        <>{slots[hoveredIndex].reward?.value}<small>% OFF</small></>
-                                                    ) : (
-                                                        <>{slots[hoveredIndex].reward?.item_name || 'FREE'}</>
-                                                    )}
-                                                </div>
-                                                {slots[hoveredIndex].reward?.description && (
-                                                    <div className="sd-footer-desc">
-                                                        <span className="quote">“</span>
-                                                        <p>{slots[hoveredIndex].reward?.description}</p>
+                                                {imageUrl && (
+                                                    <div className="sd-hero">
+                                                        <img src={imageUrl} alt={slot.label} className="sd-hero-img" />
+                                                        <div className="sd-hero-overlay"></div>
                                                     </div>
                                                 )}
+                                                <div className="sd-header">
+                                                    <div className="sd-title-group">
+                                                        <div className="sd-indicator" style={{ background: isLocked ? '#facc15' : undefined, boxShadow: isLocked ? '0 0 15px #facc15' : undefined }}></div>
+                                                        <div className="sd-title-main">
+                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                                <h4>{slot.label || 'Unnamed Wedge'}</h4>
+                                                                {isLocked && <span style={{ fontSize: '10px', background: 'rgba(250, 204, 21, 0.2)', color: '#facc15', padding: '2px 6px', borderRadius: '4px', opacity: 0.8 }}>LOCKED</span>}
+                                                            </div>
+                                                            <span className="sd-subtitle">{slot.probability}% WIN PROBABILITY</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="sd-reward-display">
+                                                    <span className="sd-reward-tag">PROBABILITY OUTCOME</span>
+                                                    {slot.reward ? (
+                                                        <>
+                                                            <div className="gv-text">
+                                                                {slot.reward.offer_type === 'PERCENTAGE_DISCOUNT' ? (
+                                                                    <>{slot.reward.value}<small>% OFF</small></>
+                                                                ) : (
+                                                                    <>{slot.reward.item_name || 'FREE ITEM'}</>
+                                                                )}
+                                                            </div>
+                                                            {slot.reward.description && (
+                                                                <div className="sd-footer-desc">
+                                                                    <span className="quote">“</span>
+                                                                    <p>{slot.reward.description}</p>
+                                                                </div>
+                                                            )}
+                                                        </>
+                                                    ) : (
+                                                        <div className="sd-null-state">
+                                                            {rewardItem ? (
+                                                                <div className="reward-detected-block">
+                                                                    <div className="gv-text" style={{ fontSize: '1.25rem' }}>{rewardItem.name}</div>
+                                                                    <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>Configuration Pending: This label matches a menu dish.</span>
+                                                                </div>
+                                                            ) : (
+                                                                <>
+                                                                    <div className="sd-null-icon">⭕</div>
+                                                                    <p>Better luck next time!</p>
+                                                                    <span>This wedge offers no reward.</span>
+                                                                </>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </>
-                                        ) : (
-                                            <div className="sd-null-state">
-                                                <div className="sd-null-icon">⭕</div>
-                                                <p>Better luck next time!</p>
-                                                <span>This wedge offers no reward.</span>
-                                            </div>
-                                        )}
-                                    </div>
+                                        );
+                                    })()}
                                 </div>
                             </div>
                         ) : (
