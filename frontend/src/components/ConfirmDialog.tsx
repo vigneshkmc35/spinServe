@@ -8,6 +8,7 @@ interface ConfirmDialogProps {
     confirmLabel?: string;
     cancelLabel?: string;
     danger?: boolean;
+    hideCancel?: boolean;
     onConfirm: () => void;
     onCancel: () => void;
 }
@@ -19,6 +20,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
     confirmLabel = 'Confirm',
     cancelLabel = 'Cancel',
     danger = true,
+    hideCancel = false,
     onConfirm,
     onCancel,
 }) => {
@@ -41,7 +43,9 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
                 <h3 className="cd-title">{title}</h3>
                 <p className="cd-message">{message}</p>
                 <div className="cd-actions">
-                    <button className="cd-btn cd-cancel" onClick={onCancel}>{cancelLabel}</button>
+                    {!hideCancel && (
+                        <button className="cd-btn cd-cancel" onClick={onCancel}>{cancelLabel}</button>
+                    )}
                     <button className={`cd-btn ${danger ? 'cd-danger' : 'cd-confirm'}`} onClick={onConfirm}>{confirmLabel}</button>
                 </div>
             </div>

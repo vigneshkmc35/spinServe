@@ -128,11 +128,11 @@
 }
 
 .slot-item {
-    border: 1px solid var(--border);
-    border-radius: var(--radius-m);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    background: var(--bg-side);
+    background: rgba(15, 23, 42, 0.4);
 }
 
 .slot-item:hover {
@@ -143,12 +143,19 @@
 
 .slot-header {
     display: flex;
-    border-left: 4px solid;
-    background: var(--bg-main);
-    padding: 0.6rem 1rem;
+    background: rgba(0, 0, 0, 0.15);
+    padding: 0.75rem 1.25rem;
     align-items: center;
     gap: 1rem;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.wedge-color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 10px currentColor;
 }
 
 .slot-title-area {
@@ -168,11 +175,23 @@
 .slot-header input {
     background: transparent;
     border: none;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.2);
     font-weight: 800;
     font-size: 1.1rem;
     color: var(--text-head);
     outline: none;
     width: 100%;
+    padding: 0.2rem 0;
+    transition: all 0.2s ease;
+}
+
+.slot-header input:hover {
+    border-bottom-color: rgba(255, 255, 255, 0.5);
+}
+
+.slot-header input:focus {
+    border-bottom-color: var(--primary);
+    background: rgba(0, 0, 0, 0.1);
 }
 
 .btn-remove-slot {
@@ -264,13 +283,27 @@
     background: rgba(var(--primary-rgb), 0.02);
 }
 
+.add-wedge-btn.btn-full-capacity {
+    border-style: solid;
+    border-color: rgba(16, 185, 129, 0.2);
+    background: rgba(16, 185, 129, 0.05);
+    color: #10b981;
+    cursor: default;
+}
+
+.add-wedge-btn.btn-full-capacity:hover {
+    border-color: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.05);
+}
+
 .add-wedge-btn .plus {
     font-size: 1.5rem;
 }
 
 .preview-header {
     margin-bottom: 1rem;
-    text-align: center;
+    width: 100%;
 }
 
 .preview-header h3 {
@@ -281,6 +314,7 @@
 .preview-header p {
     font-size: 0.8rem;
     color: var(--text-body);
+    text-align: left;
 }
 
 .animate-slide-down {

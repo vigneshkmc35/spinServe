@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ConfirmDialog from '../../components/ConfirmDialog';
 import './SpinConfigModule.css';
 
 export interface SpinnerSlot {
@@ -26,6 +27,8 @@ const SpinConfigModule: React.FC<SpinConfigModuleProps> = ({ config, menuItems, 
     const [incrementThreshold, setIncrementThreshold] = useState(config?.game_unlock_increment || 50);
     const [slots, setSlots] = useState<SpinnerSlot[]>([]);
     const [errors, setErrors] = useState<Record<string, boolean>>({});
+    const [isAlertOpen, setIsAlertOpen] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
 
     useEffect(() => {
         if (config) {
@@ -53,6 +56,15 @@ const SpinConfigModule: React.FC<SpinConfigModuleProps> = ({ config, menuItems, 
     };
 
     const updateSlot = (index: number, key: string, value: any) => {
+        if (key === 'probability') {
+            const valNum = Number(value);
+            const otherTotal = slots.reduce((acc, slot, i) => i === index ? acc : acc + slot.probability, 0);
+            if (otherTotal + valNum > 100) {
+                setAlertMessage('Total probability cannot exceed 100%. Adjusting to maximum available capacity.');
+                setIsAlertOpen(true);
+                value = 100 - otherTotal;
+            }
+        }
         const newSlots = [...slots];
         (newSlots[index] as any)[key] = value;
         setSlots(newSlots);
@@ -198,15 +210,13 @@ const SpinConfigModule: React.FC<SpinConfigModuleProps> = ({ config, menuItems, 
                     <div className="sc-section">
                         <div className="section-header-row">
                             <h3 className="section-label">2. Wheel Wedges</h3>
-                            <div className={`prob-indicator ${totalProb === 100 ? 'perfect' : 'invalid'}`}>
-                                {totalProb}% / 100%
-                            </div>
                         </div>
 
                         <div className="slot-list">
                             {slots.map((slot, index) => (
                                 <div key={index} id={`slot-${index}`} className={`slot-item ${errors[`slot-${index}-label`] || errors[`slot-${index}-prob`] || errors[`slot-${index}-reward-value`] || errors[`slot-${index}-reward-item`] ? 'has-error' : ''}`}>
-                                    <div className="slot-header" style={{ borderLeftColor: colors[index % colors.length] }}>
+                                    <div className="slot-header">
+                                        <div className="wedge-color-dot" style={{ background: colors[index % colors.length], color: colors[index % colors.length] }}></div>
                                         <div className="slot-title-area">
                                             <span className="slot-index">#{index + 1}</span>
                                             <input
@@ -348,9 +358,20 @@ const SpinConfigModule: React.FC<SpinConfigModuleProps> = ({ config, menuItems, 
                                 </div>
                             ))}
                         </div>
-                        <button className="add-wedge-btn" onClick={handleAddSlot}>
-                            <span className="plus">+</span> Add New Wheel Wedge
-                        </button>
+                        {(() => {
+                            const remainingProb = Math.max(0, 100 - totalProb);
+                            const isFull = remainingProb === 0;
+                            return (
+                                <button
+                                    className={`add-wedge-btn ${isFull ? 'btn-full-capacity' : ''}`}
+                                    onClick={handleAddSlot}
+                                    disabled={isFull}
+                                >
+                                    <span className="plus">{isFull ? '✓' : '+'}</span>
+                                    {isFull ? 'Wheel is at 100% Capacity' : `Add New Wedge (${remainingProb}% Capacity Left)`}
+                                </button>
+                            );
+                        })()}
                     </div>
                 </div>
             </div>
@@ -358,7 +379,12 @@ const SpinConfigModule: React.FC<SpinConfigModuleProps> = ({ config, menuItems, 
             <div className="sc-right-col">
                 <div className="spin-preview-container">
                     <div className="preview-header">
-                        <h3>Live Preview</h3>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: '0.5rem' }}>
+                            <h3>Live Preview</h3>
+                            <div className={`prob-indicator ${totalProb === 100 ? 'perfect' : 'invalid'}`}>
+                                {totalProb}% / 100%
+                            </div>
+                        </div>
                         <p>Hover on segments to audit details</p>
                     </div>
 
@@ -492,6 +518,17 @@ const SpinConfigModule: React.FC<SpinConfigModuleProps> = ({ config, menuItems, 
                     </div>
                 </div>
             </div>
+
+            <ConfirmDialog
+                isOpen={isAlertOpen}
+                title="Capacity Limit Reached"
+                message={alertMessage}
+                danger={false}
+                confirmLabel="Understood"
+                hideCancel={true}
+                onConfirm={() => setIsAlertOpen(false)}
+                onCancel={() => setIsAlertOpen(false)}
+            />
         </div>
     );
 };
