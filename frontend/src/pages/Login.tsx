@@ -53,31 +53,36 @@ const Login: React.FC = () => {
 
     return (
         <div className="login-page" onMouseMove={handleMouseMove}>
-            {/* Interactive Background Mesh */}
+            {/* Interactive Background Mesh - Premium Deep Parallax */}
             <div className="bg-parallax-layer" style={{
-                transform: `scale(1.1) translate(${mousePos.x * 0.5}px, ${mousePos.y * 0.5}px)`
+                transform: `scale(1.1) translate(${mousePos.x * 0.3}px, ${mousePos.y * 0.3}px)`
             }}></div>
 
-            {/* High-End Background Elements with Intense Parallax */}
+            {/* Cinematic Floating Elements with Dynamic Depth */}
             <div className="floating-element" style={{
-                top: '15%', left: '15%',
-                transform: `translate(${mousePos.x * -1.5}px, ${mousePos.y * -1.5}px) rotate(${mousePos.x * 0.5}deg)`
+                top: '12%', left: '8%',
+                transform: `translate(${mousePos.x * -1.2}px, ${mousePos.y * -1.2}px) rotate(${mousePos.x * 0.3}deg)`,
+                fontSize: '6.5rem'
             }}>🍕</div>
             <div className="floating-element" style={{
-                top: '60%', left: '12%',
-                transform: `translate(${mousePos.x * 2}px, ${mousePos.y * 2}px) rotate(${mousePos.x * -1}deg)`
+                top: '55%', left: '10%',
+                transform: `translate(${mousePos.x * 1.5}px, ${mousePos.y * 1.5}px) rotate(${mousePos.x * -0.8}deg)`,
+                fontSize: '5rem'
             }}>🍱</div>
             <div className="floating-element" style={{
-                top: '20%', right: '15%',
-                transform: `translate(${mousePos.x * -3}px, ${mousePos.y * -3}px) rotate(${mousePos.x}deg)`
+                top: '18%', right: '12%',
+                transform: `translate(${mousePos.x * -2.5}px, ${mousePos.y * -2.5}px) rotate(${mousePos.x * 0.7}deg)`,
+                fontSize: '6rem'
             }}>🍜</div>
             <div className="floating-element" style={{
-                top: '75%', right: '20%',
-                transform: `translate(${mousePos.x * 1.8}px, ${mousePos.y * 1.8}px) rotate(${mousePos.y * 0.5}deg)`
+                top: '70%', right: '15%',
+                transform: `translate(${mousePos.x * 1.2}px, ${mousePos.y * 1.2}px) rotate(${mousePos.y * 0.4}deg)`,
+                fontSize: '5.5rem'
             }}>🍔</div>
             <div className="floating-element" style={{
-                top: '45%', left: '40%', opacity: 0.25,
-                transform: `translate(${mousePos.x * 0.5}px, ${mousePos.y * 0.5}px)`
+                top: '40%', left: '45%',
+                transform: `translate(${mousePos.x * 0.4}px, ${mousePos.y * 0.4}px)`,
+                fontSize: '3.5rem'
             }}>🥟</div>
 
             <div className="login-card">
@@ -91,7 +96,7 @@ const Login: React.FC = () => {
                         <span className="main-icon">🍱</span>
                     </div>
                     <h1>Staff <span>Management</span></h1>
-                    <p>Royal Digital Dining Suite</p>
+                    <p>SpinServe Digital Dining Suite</p>
                 </div>
 
                 <form className="login-form" onSubmit={handleLogin}>
@@ -104,6 +109,7 @@ const Login: React.FC = () => {
                             onChange={(e) => setMobile(e.target.value)}
                             required
                             disabled={isLoading}
+                            autoComplete="tel"
                         />
                     </div>
 
@@ -116,18 +122,14 @@ const Login: React.FC = () => {
                             onChange={(e) => setPassword(e.target.value)}
                             required
                             disabled={isLoading}
+                            autoComplete="current-password"
                         />
                     </div>
 
                     <button type="submit" className="login-btn" disabled={isLoading}>
-                        {isLoading ? 'Entering...' : 'Enter Suite'}
+                        {isLoading ? 'Authenticating...' : 'Enter Suite'}
                     </button>
                 </form>
-
-                <div className="demo-box">
-                    <p>Standard Demo Index: <b>6374503440</b></p>
-                    <p>Access Key: <b>Abc@123</b></p>
-                </div>
             </div>
         </div>
     );
