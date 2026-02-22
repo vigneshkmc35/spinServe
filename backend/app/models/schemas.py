@@ -61,12 +61,20 @@ class Table(BaseModel):
     qr_code_id: str             # Unique short string/UUID to build the QR code URL (e.g. /qr/<qr_code_id>)
     current_session_id: Optional[str] = None # Open dining session ID if occupied
 
+class MenuGroup(BaseModel):
+    id: Optional[str] = Field(None, alias="_id")
+    restaurant_id: str
+    title: str
+    image_url: Optional[str] = None
+
 class MenuItem(BaseModel):
     id: Optional[str] = Field(None, alias="_id")
     restaurant_id: str
+    group_id: str
     name: str
+    description: Optional[str] = None
     price: float
-    category: str
+    image_url: Optional[str] = None
     is_available: bool = True
 
 class Reward(BaseModel):

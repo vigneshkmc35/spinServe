@@ -13,36 +13,31 @@ export const authAPI = {
 };
 
 export const staffAPI = {
-    getAll: async () => {
-        const response = await api.get('/staff/');
-        return response.data;
-    },
-    create: async (data: { name: string; mobile: string; role: string }) => {
-        const response = await api.post('/staff/', data);
-        return response.data;
-    },
-    update: async (id: string, data: { name?: string; mobile?: string }) => {
-        const response = await api.put(`/staff/${id}`, data);
-        return response.data;
-    },
-    delete: async (id: string) => {
-        const response = await api.delete(`/staff/${id}`);
-        return response.data;
-    }
+    getAll: async () => { const r = await api.get('/staff/'); return r.data; },
+    create: async (data: { name: string; mobile: string; role: string }) => { const r = await api.post('/staff/', data); return r.data; },
+    update: async (id: string, data: { name?: string; mobile?: string }) => { const r = await api.put(`/staff/${id}`, data); return r.data; },
+    delete: async (id: string) => { const r = await api.delete(`/staff/${id}`); return r.data; }
 };
 
 export const menuAPI = {
-    getAll: async () => {
-        const response = await api.get('/restaurant/menu');
-        return response.data;
-    }
-};
+    getGroups: async () => { const r = await api.get('/menu/groups'); return r.data; },
+    createGroup: async (data: { title: string; image_url?: string }) => { const r = await api.post('/menu/groups', data); return r.data; },
+    deleteGroup: async (id: string) => { const r = await api.delete(`/menu/groups/${id}`); return r.data; },
 
-export const restaurantAPI = {
-    getConfig: async () => {
-        const response = await api.get('/restaurant/config');
-        return response.data;
-    }
+    getItems: async (groupId?: string) => {
+        const url = groupId ? `/menu/items?group_id=${groupId}` : '/menu/items';
+        const r = await api.get(url);
+        return r.data;
+    },
+    createItem: async (data: { group_id: string; name: string; description?: string; price: number; image_url?: string }) => {
+        const r = await api.post('/menu/items', data);
+        return r.data;
+    },
+    updateItem: async (id: string, data: { name?: string; description?: string; price?: number; image_url?: string; is_available?: boolean }) => {
+        const r = await api.put(`/menu/items/${id}`, data);
+        return r.data;
+    },
+    deleteItem: async (id: string) => { const r = await api.delete(`/menu/items/${id}`); return r.data; }
 };
 
 export default api;
