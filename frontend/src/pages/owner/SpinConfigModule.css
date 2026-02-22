@@ -84,25 +84,11 @@
     overflow-y: auto;
     padding-right: 1rem;
     padding-bottom: var(--sc-safe-bottom);
-    /* Proper premium padding instead of massive empty space */
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
     margin-top: 1rem;
     scrollbar-gutter: stable;
-}
-
-.sc-scroll-content::-webkit-scrollbar {
-    width: 5px;
-}
-
-.sc-scroll-content::-webkit-scrollbar-thumb {
-    background: var(--sc-thumb);
-    border-radius: 10px;
-}
-
-.sc-scroll-content::-webkit-scrollbar-track {
-    background: transparent;
 }
 
 .sc-section {
@@ -592,18 +578,7 @@
     z-index: 1;
     padding: 1.25rem 1.5rem;
     flex: 1;
-    /* Take all available space in the card */
     overflow-y: auto;
-    /* Handle long content here solely */
-}
-
-.sd-content::-webkit-scrollbar {
-    width: 4px;
-}
-
-.sd-content::-webkit-scrollbar-thumb {
-    background: var(--sc-thumb);
-    border-radius: 10px;
 }
 
 .sd-header {

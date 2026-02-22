@@ -56,13 +56,29 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar,
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+html,
+body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 body {
   background-color: var(--bg-dark);
   color: var(--text-main);
   font-family: var(--font);
-  overflow-x: hidden;
+  overflow: hidden;
   line-height: 1.5;
   transition: background-color 0.5s ease;
 }
@@ -151,4 +167,40 @@ body {
 
 .animate-in {
   animation: fadeIn 0.8s ease-out forwards;
+}
+
+/* ─────────────────────────────────────────────────────────
+   NUCLEAR SCROLLBAR REMOVAL: UNIFIED APP SHIELD
+   Ensures absolutely NO scrollbars are visible globally.
+   ────────────────────────────────────────────────────────── */
+* {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+html,
+body {
+  overflow: hidden !important;
+  scrollbar-width: none !important;
+}
+
+.scroll-content,
+.menu-scroll-area,
+.sc-scroll-content,
+.sd-content {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.scroll-content::-webkit-scrollbar,
+.menu-scroll-area::-webkit-scrollbar,
+.sc-scroll-content::-webkit-scrollbar,
+.sd-content::-webkit-scrollbar {
+  display: none !important;
 }
