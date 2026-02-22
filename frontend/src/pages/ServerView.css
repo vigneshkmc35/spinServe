@@ -1,0 +1,79 @@
+.sessions-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.session-card {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.table-badge {
+    background: var(--color-primary);
+    padding: 0.4rem 1rem;
+    border-radius: 8px;
+    font-weight: 700;
+}
+
+.status-pill {
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.status-pill.LOCKED {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-dim);
+}
+
+.status-pill.UNLOCKED {
+    background: var(--success);
+    color: white;
+    box-shadow: 0 0 15px var(--success);
+}
+
+.status-pill.WON {
+    background: var(--color-secondary);
+    color: white;
+}
+
+.order-summary .total {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.order-summary ul {
+    list-style: none;
+    color: var(--text-dim);
+}
+
+.add-controls {
+    display: grid;
+    grid-template-columns: 2fr 1fr auto;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.add-controls select,
+.add-controls input {
+    background: var(--bg-dark);
+    border: 1px solid var(--glass-border);
+    color: white;
+    padding: 0.8rem;
+    border-radius: 8px;
+    outline: none;
+}

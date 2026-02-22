@@ -1,0 +1,50 @@
+.navbar {
+    margin: 1.5rem 2rem;
+    padding: 0.8rem 2.5rem;
+    border-radius: 100px;
+    position: sticky;
+    top: 1.5rem;
+    z-index: 1000;
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.brand {
+    font-size: 1.8rem;
+    font-weight: 800;
+    text-decoration: none;
+    letter-spacing: -1px;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: var(--text-dim);
+    font-weight: 500;
+    transition: var(--transition);
+    font-size: 1rem;
+}
+
+.nav-link:hover {
+    color: var(--text-main);
+}
+
+.login-btn {
+    padding: 0.6rem 1.5rem;
+    font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+    .nav-links {
+        display: none;
+    }
+}
