@@ -7,11 +7,13 @@ yarn-error.log*
 .eslintcache
 
 # Python
-venv/
-.venv/
 __pycache__/
+**/__pycache__/
 *.py[cod]
 *$py.class
+*.pyc
+venv/
+.venv/
 .env
 .pytest_cache/
 
