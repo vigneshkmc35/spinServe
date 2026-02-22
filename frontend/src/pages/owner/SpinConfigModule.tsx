@@ -34,8 +34,26 @@ const SpinConfigModule: React.FC<SpinConfigModuleProps> = ({ config, menuItems, 
         if (config) {
             setInitialThreshold(config.game_unlock_initial || 200);
             setIncrementThreshold(config.game_unlock_increment || 50);
+
             if (config.spinner_slots && config.spinner_slots.length > 0) {
-                setSlots(config.spinner_slots);
+                // If menuItems is available, reconstruct category_id for Free Menu Item rewards if it's missing
+                // This ensures the dropdowns are correctly populated on reload
+                const restoredSlots = config.spinner_slots.map((slot: SpinnerSlot) => {
+                    if (slot.reward?.offer_type === 'FREE_ITEM' && slot.reward.item_name && (!slot.reward.category_id)) {
+                        const matchedItem = menuItems.find(m => m.name === slot.reward!.item_name);
+                        if (matchedItem) {
+                            return {
+                                ...slot,
+                                reward: {
+                                    ...slot.reward,
+                                    category_id: matchedItem.group_id
+                                }
+                            };
+                        }
+                    }
+                    return slot;
+                });
+                setSlots(restoredSlots);
             } else {
                 setSlots([
                     { label: 'Try Again', probability: 20, reward: null },
@@ -45,7 +63,7 @@ const SpinConfigModule: React.FC<SpinConfigModuleProps> = ({ config, menuItems, 
                 ]);
             }
         }
-    }, [config]);
+    }, [config, menuItems]);
 
     const handleAddSlot = () => {
         setSlots([...slots, { label: 'New Reward', probability: 0, reward: null }]);

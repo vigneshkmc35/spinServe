@@ -84,6 +84,7 @@ class Reward(BaseModel):
     value: float                # Value for percentage, or value in currency for flat discount
     description: str            # E.g., "10% Off via SpinWheel", "1 Plate Biriyani"
     item_name: Optional[str] = None # Set if offer_type is FREE_ITEM
+    category_id: Optional[str] = None # Helper for frontend UI selection persistence
 
 class SpinnerSlot(BaseModel):
     label: str                  # e.g., "1 Plate Biriyani", "10% Off", "Next Spin"

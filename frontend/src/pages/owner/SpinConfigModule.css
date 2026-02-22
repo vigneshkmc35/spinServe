@@ -13,6 +13,7 @@
     --sc-thumb: rgba(0, 0, 0, 0.1);
     --text-head-rgb: 26, 26, 27;
     /* #1a1a1b */
+    --sc-safe-bottom: 2rem;
 }
 
 .dark-mode .spin-config-layout {
@@ -24,13 +25,16 @@
     --sc-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.6);
     --sc-thumb: rgba(255, 255, 255, 0.1);
     --text-head-rgb: 255, 255, 255;
+    --sc-safe-bottom: 2rem;
 }
 
 .sc-left-col {
     flex: 1.25;
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 120px);
+    height: calc(100vh - 144px);
+    /* Perfectly balanced: 80px header + 2rem top + 2rem bottom */
+    overflow: hidden;
 }
 
 /* Configuration Card removed in favor of Section-based layout */
@@ -50,7 +54,7 @@
 }
 
 .sc-fixed-section {
-    padding-top: 1rem;
+    padding-top: 0.5rem;
     flex-shrink: 0;
 }
 
@@ -79,7 +83,8 @@
     flex: 1;
     overflow-y: auto;
     padding-right: 1rem;
-    padding-bottom: 200px;
+    padding-bottom: var(--sc-safe-bottom);
+    /* Proper premium padding instead of massive empty space */
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
@@ -431,25 +436,27 @@
     display: flex;
     flex-direction: column;
     background: transparent;
-    padding: 1rem;
+    padding: 0;
     position: sticky;
-    top: 3.5rem;
-    height: auto;
-    margin-bottom: 4rem;
-    overflow: visible;
+    top: 0;
+    height: calc(100vh - 144px);
+    /* Synchronized with left column */
+    overflow: hidden;
 }
 
 .spin-preview-container {
     background: var(--bg-side);
     border-radius: var(--radius-l);
     border: 1px solid var(--border);
-    padding: 2.5rem;
-    padding-bottom: 4rem;
+    padding: 2rem;
+    height: 100%;
+    /* Fill balanced height */
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1rem;
+    /* Compact gap for better vertical fit */
     box-shadow: var(--sc-shadow);
 }
 
@@ -523,21 +530,27 @@
 
 .selection-card-area {
     width: 100%;
-    min-height: 240px;
+    flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
     perspective: 1200px;
+    overflow: hidden;
+    /* Prevent child spillover */
 }
 
 .selection-detail-card {
     width: 100%;
+    max-height: 100%;
+    /* Elastic constraint */
     background: var(--bg-side);
     backdrop-filter: blur(20px);
     border: 1px solid var(--border);
     border-radius: 20px;
     position: relative;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
     box-shadow: var(--shadow);
     transition: all 0.5s cubic-bezier(0.2, 1, 0.3, 1);
 }
@@ -556,7 +569,8 @@
 
 .sd-hero {
     position: relative;
-    height: 140px;
+    height: 120px;
+    /* More compact hero to provide more room for details */
     margin: -1.25rem -1.5rem 1rem;
     overflow: hidden;
 }
@@ -577,8 +591,10 @@
     position: relative;
     z-index: 1;
     padding: 1.25rem 1.5rem;
-    max-height: 280px;
+    flex: 1;
+    /* Take all available space in the card */
     overflow-y: auto;
+    /* Handle long content here solely */
 }
 
 .sd-content::-webkit-scrollbar {
@@ -586,7 +602,7 @@
 }
 
 .sd-content::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--sc-thumb);
     border-radius: 10px;
 }
 
@@ -636,13 +652,14 @@
 }
 
 .sd-reward-tag {
-    font-size: 0.7rem;
-    font-weight: 950;
-    color: var(--primary);
-    opacity: 0.8;
-    letter-spacing: 0.15em;
-    margin-bottom: 0.75rem;
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--text-body);
+    opacity: 0.6;
+    letter-spacing: 0.2em;
+    margin-bottom: 0.5rem;
     display: block;
+    text-transform: uppercase;
 }
 
 .reward-detected-block {
@@ -652,43 +669,50 @@
 }
 
 .gv-text {
-    font-size: 1.75rem;
-    font-weight: 950;
-    color: var(--primary);
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--text-head);
     line-height: 1.2;
     text-transform: uppercase;
     word-break: break-word;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.25rem;
+    text-shadow: 0 0 20px rgba(var(--text-head-rgb, 255, 255, 255), 0.1);
 }
 
 .gv-text small {
-    font-size: 0.9rem;
-    opacity: 0.6;
-    margin-left: 4px;
+    font-size: 0.8rem;
+    color: var(--accent-color);
+    margin-left: 6px;
+    font-weight: 800;
 }
 
 .sd-footer-desc {
     margin-top: 1rem;
     display: flex;
-    gap: 0.5rem;
-    padding: 0.75rem;
-    background: var(--sc-header-bg);
-    border-radius: 10px;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    background: rgba(var(--text-head-rgb), 0.03);
+    border-radius: 12px;
+    border-left: 3px solid var(--accent-color);
+    transition: all 0.3s ease;
 }
 
 .sd-footer-desc .quote {
-    font-family: serif;
-    font-size: 2rem;
+    font-size: 1.25rem;
     line-height: 1;
     color: var(--accent-color);
-    opacity: 0.5;
+    opacity: 0.6;
+    font-style: italic;
 }
 
 .sd-footer-desc p {
-    font-size: 0.95rem;
-    font-style: italic;
+    font-size: 0.85rem;
     color: var(--text-body);
-    opacity: 0.8;
-    line-height: 1.4;
+    font-weight: 500;
+    line-height: 1.5;
+    margin: 0;
 }
 
 .sd-null-state {

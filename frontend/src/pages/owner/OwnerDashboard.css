@@ -13,6 +13,7 @@
     --radius-m: 16px;
     --radius-s: 12px;
     --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --header-height: 80px;
 }
 
 .dark-mode {
@@ -131,10 +132,13 @@
     display: flex;
     flex-direction: column;
     height: 100vh;
+    overflow: hidden;
+    /* Prevent page-level scroll */
 }
 
 .app-header {
-    height: 100px;
+    height: 80px;
+    /* Reduced from 100px to gain more vertical space */
     padding: 0 4rem;
     border-bottom: 1px solid var(--border);
     display: flex;
@@ -198,15 +202,19 @@
 .scroll-content {
     flex: 1;
     overflow-y: auto;
-    padding: 4rem;
+    padding: 2rem;
+    /* Reduced from 4rem to fit more content without overflow */
     background: var(--bg-main);
-    scrollbar-width: none;
-    /* Firefox */
+    scrollbar-width: thin;
 }
 
 .scroll-content::-webkit-scrollbar {
-    display: none;
-    /* Chrome/Safari */
+    width: 6px;
+}
+
+.scroll-content::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
 }
 
 .module-view {
